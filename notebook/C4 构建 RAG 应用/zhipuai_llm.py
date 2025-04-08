@@ -1,7 +1,7 @@
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional,Union
 from zhipuai import ZhipuAI
 from langchain_core.callbacks import (
-    CallbackManagerForLLMRun,
+    CallbackManagerForLLMRun,Callbacks
 )
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import (
@@ -15,12 +15,14 @@ from langchain_core.messages import (
 from langchain_core.messages.ai import UsageMetadata
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 import time
+import os
+from langchain_core.caches import BaseCache
 
 class ZhipuaiLLM(BaseChatModel):
     """自定义Zhipuai聊天模型。
     """
 
-    model_name: str = None
+    model_name: str ="glm-4-flash"
     temperature: Optional[float] = None
     max_tokens: Optional[int] = None
     timeout: Optional[int] = None
@@ -167,9 +169,10 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
 
 if __name__ == "__main__":
     # Test
-    model = ZhipuaiLLM(model_name="glm-4-plus")
+    model = ZhipuaiLLM()
     # invoke
     answer = model.invoke("Hello")
+    print('--'*20)
     print(answer)
     answer = model.invoke(
             [
@@ -178,6 +181,7 @@ if __name__ == "__main__":
             HumanMessage(content="Meow!"),
         ]
     )
+
     print(answer)
     # stream
     for chunk in model.stream([
@@ -187,4 +191,5 @@ if __name__ == "__main__":
         ]):
         print(chunk.content, end="|")
     # batch
+
     print(model.batch(["hello", "goodbye"]))
